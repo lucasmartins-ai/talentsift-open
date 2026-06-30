@@ -1,0 +1,8 @@
+Synthetic candidate profile for local UI testing.
+
+Recent work:
+- Built TypeScript and React interfaces for internal operations.
+- Used PostgreSQL for reporting workflows.
+- Collaborated on a remote SaaS product team.
+
+Availability: Immediate.

@@ -1,0 +1,14 @@
+.next/
+node_modules/
+coverage/
+dist/
+out/
+.playwright-cli/
+playwright-report/
+test-results/
+tsconfig.tsbuildinfo
+data/
+
+docs/**/*.md
+CONTRIBUTING.md
+SECURITY.md
