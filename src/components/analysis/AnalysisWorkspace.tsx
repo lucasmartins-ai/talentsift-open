@@ -2,7 +2,11 @@
 
 import { useMemo, useState } from "react";
 import type { ApiResponse } from "@/lib/api-response";
-import type { PrivacyMode, SeniorityLevel } from "@/types/domain";
+import type {
+  PrivacyMode,
+  RankingResult,
+  SeniorityLevel,
+} from "@/types/domain";
 import { CandidateUploadPanel } from "@/components/candidates/CandidateUploadPanel";
 import { ComparisonPlaceholder } from "@/components/comparison/ComparisonPlaceholder";
 import { Button } from "@/components/ui/Button";
@@ -19,6 +23,13 @@ type UploadStatus = {
   status: "registered" | "skipped" | "failed";
   message: string;
 };
+
+type CandidateResult = {
+  candidateLabel: string;
+  ranking: RankingResult;
+};
+
+const MAX_CV_TEXT_CHARS = 200_000;
 
 const seniorityOptions: Array<
   { value: ""; label: string } | { value: SeniorityLevel; label: string }
@@ -43,6 +54,7 @@ export function AnalysisWorkspace() {
   const [analysisId, setAnalysisId] = useState<string | null>(null);
   const [analysisStatus, setAnalysisStatus] = useState<string | null>(null);
   const [uploadStatuses, setUploadStatuses] = useState<UploadStatus[]>([]);
+  const [results, setResults] = useState<CandidateResult[]>([]);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -56,6 +68,7 @@ export function AnalysisWorkspace() {
     setIsSubmitting(true);
     setErrorMessage(null);
     setUploadStatuses([]);
+    setResults([]);
 
     try {
       const createResponse = await fetch("/api/analyses", {
@@ -87,6 +100,7 @@ export function AnalysisWorkspace() {
       setAnalysisStatus(createEnvelope.data.status);
 
       const registeredUploads: UploadStatus[] = [];
+      const rankedResults: CandidateResult[] = [];
       for (const file of files) {
         const contentType = normalizeContentType(file);
         if (!contentType) {
@@ -97,6 +111,12 @@ export function AnalysisWorkspace() {
           });
           continue;
         }
+
+        const candidateLabel = removeExtension(file.name);
+        const candidateText =
+          contentType === "text/plain"
+            ? (await file.text()).slice(0, MAX_CV_TEXT_CHARS)
+            : undefined;
 
         const response = await fetch(
           `/api/analyses/${createEnvelope.data.analysisId}/candidates`,
@@ -109,7 +129,8 @@ export function AnalysisWorkspace() {
               originalFilename: file.name,
               contentType,
               sizeBytes: file.size,
-              candidateLabel: removeExtension(file.name),
+              candidateLabel,
+              candidateText,
             }),
           },
         );
@@ -117,18 +138,31 @@ export function AnalysisWorkspace() {
           candidateId: string;
           documentId: string;
           status: string;
+          ranking: RankingResult | null;
+          warnings: string[];
         }>;
+
+        if (envelope.success && envelope.data?.ranking) {
+          rankedResults.push({
+            candidateLabel,
+            ranking: envelope.data.ranking,
+          });
+        }
 
         registeredUploads.push({
           fileName: file.name,
           status: envelope.success ? "registered" : "failed",
           message: envelope.success
-            ? "Metadata registered"
+            ? envelope.data?.ranking
+              ? `Score ${envelope.data.ranking.score}/100`
+              : "Metadata registered"
             : (envelope.error?.message ?? "Registration failed"),
         });
       }
 
+      rankedResults.sort((a, b) => b.ranking.score - a.ranking.score);
       setUploadStatuses(registeredUploads);
+      setResults(rankedResults);
     } catch (error) {
       setErrorMessage(
         error instanceof Error ? error.message : "Unexpected error.",
@@ -141,18 +175,39 @@ export function AnalysisWorkspace() {
   return (
     <main className="workspace-shell">
       <section className="topbar" aria-label="Product context">
-        <div>
+        <div className="topbar-copy">
           <p className="eyebrow">TalentSift Open</p>
           <h1>AI-assisted CV review workspace</h1>
+          <div className="context-pills" aria-label="Demo boundaries">
+            <span>Local SQLite demo</span>
+            <span>Mock AI boundary</span>
+            <span>Human review required</span>
+          </div>
         </div>
-        <p className="human-review-note">
-          Supports human review. It does not decide employment or interview
-          outcomes.
-        </p>
+        <div className="human-review-note">
+          <strong>Assistive review only</strong>
+          <p>
+            Supports human review. It does not decide employment or interview
+            outcomes.
+          </p>
+        </div>
       </section>
 
       <div className="workspace-grid">
         <form className="workflow-panel" onSubmit={handleSubmit}>
+          <div className="command-bar">
+            <div>
+              <h2>Review setup</h2>
+              <p>
+                Create a local analysis record, then register selected CV
+                metadata.
+              </p>
+            </div>
+            <Button type="submit" disabled={!canSubmit}>
+              {isSubmitting ? "Creating workspace..." : "Create analysis"}
+            </Button>
+          </div>
+
           <section className="workflow-section" aria-labelledby="job-heading">
             <div className="section-heading-row">
               <div>
@@ -251,15 +306,6 @@ export function AnalysisWorkspace() {
               {errorMessage}
             </p>
           ) : null}
-
-          <div className="action-row">
-            <Button type="submit" disabled={!canSubmit}>
-              {isSubmitting ? "Creating analysis..." : "Create analysis"}
-            </Button>
-            <p>
-              Validation and ranking run server-side as the pipeline expands.
-            </p>
-          </div>
         </form>
 
         <aside className="review-panel" aria-label="Analysis output">
@@ -267,6 +313,7 @@ export function AnalysisWorkspace() {
             analysisId={analysisId}
             status={analysisStatus}
             uploads={uploadStatuses}
+            results={results}
           />
           <ComparisonPlaceholder />
         </aside>

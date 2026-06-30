@@ -25,9 +25,9 @@ Exit criteria:
 
 Outcome: the demo shows a complete reviewer-facing loop using synthetic data.
 
-- Add mock extracted profiles for selected synthetic CVs.
-- Connect deterministic ranking to the UI.
-- Show score, evidence, gaps, confidence, and review flags.
+- Add mock extracted profiles for selected synthetic TXT CVs. Done.
+- Connect deterministic ranking to the UI. Done.
+- Show score, evidence, gaps, confidence, and review flags. Done.
 - Keep all generated results local.
 - Keep all copy assistive and human-review oriented.
 
@@ -35,7 +35,7 @@ Exit criteria:
 
 - User can create an analysis.
 - User can register supported CV metadata.
-- User can see mock shortlist results.
+- User can see mock shortlist results for TXT files.
 - No raw CV text is stored.
 
 ## Phase 2: Comparison And Export

@@ -12,7 +12,7 @@ export function CandidateUploadPanel({
       <div className="section-heading-row">
         <div>
           <h2 id="upload-heading">Candidate CVs</h2>
-          <p>Upload PDF or text CVs. Processing runs server-side.</p>
+          <p>Select synthetic TXT CVs to rank, or PDFs for metadata only.</p>
         </div>
         <span className="count-badge">{files.length} selected</span>
       </div>
@@ -27,9 +27,11 @@ export function CandidateUploadPanel({
             onFilesChange(Array.from(event.currentTarget.files ?? []))
           }
         />
+        <span className="upload-marker" aria-hidden="true" />
         <span className="upload-title">Choose CV files</span>
         <span className="upload-copy">
-          Files are only registered as metadata in this foundation build.
+          PDF or TXT, up to 10 MB each. TXT text is ranked in-memory and never
+          stored.
         </span>
       </label>
 
@@ -38,12 +40,12 @@ export function CandidateUploadPanel({
           {files.map((file) => (
             <li key={`${file.name}-${file.size}`}>
               <span>{file.name}</span>
-              <strong>{formatFileSize(file.size)}</strong>
+              <strong className="file-meta">{formatFileSize(file.size)}</strong>
             </li>
           ))}
         </ul>
       ) : (
-        <p className="empty-note">No CVs selected yet.</p>
+        <p className="empty-note">No CV metadata selected yet.</p>
       )}
     </section>
   );

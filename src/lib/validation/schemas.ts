@@ -54,6 +54,8 @@ export const uploadMetadataSchema = z.object({
     .positive()
     .max(10 * 1024 * 1024),
   candidateLabel: normalizedString.min(1).max(120).optional(),
+  // Processed in-memory for ranking, then discarded — never persisted or logged.
+  candidateText: z.string().max(200_000).optional(),
 });
 
 export const resultFiltersSchema = z.object({

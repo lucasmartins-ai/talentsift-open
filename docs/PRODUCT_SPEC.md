@@ -49,9 +49,17 @@ The user can paste a role description and optional scoring hints:
 - Seniority.
 - Privacy-first mode.
 
-### CV Metadata Registration
+### CV Metadata Registration And Mock Review
 
-The user can select PDF or text CV files. The current demo registers file metadata only. It does not upload, parse, or store raw CV text.
+The user can select PDF or text CV files. The current demo always registers
+file metadata locally. TXT files can also be processed in memory by the mock
+pipeline so the UI can show reviewer-facing scores, evidence, gaps,
+confidence, and review flags.
+
+PDF text extraction is not enabled yet. PDF files are registered as metadata
+only and receive a parser warning when ranking is requested.
+
+Raw CV text is not stored in SQLite.
 
 MVP constraints:
 
@@ -59,6 +67,7 @@ MVP constraints:
 - Limit file size through validation.
 - Return clear validation errors.
 - Use synthetic/demo documents only.
+- Keep mock extraction local and deterministic.
 
 ### Local Persistence
 
@@ -68,7 +77,8 @@ The SQLite database is created under `data/` and ignored by Git.
 
 ### Ranking Foundation
 
-The deterministic ranking service is implemented and tested independently. It is ready to receive structured mock profiles in future UI phases.
+The deterministic ranking service is implemented, tested independently, and
+connected to the mock TXT extraction flow.
 
 The score returns:
 

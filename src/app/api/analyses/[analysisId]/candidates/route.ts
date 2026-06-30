@@ -46,16 +46,19 @@ export async function POST(
   }
 
   try {
-    const { candidate, document } = await candidateService.createUploadMetadata(
-      parsedAnalysisId.data,
-      parsedBody.data,
-    );
+    const { candidate, document, ranking, warnings } =
+      await candidateService.createUploadMetadata(
+        parsedAnalysisId.data,
+        parsedBody.data,
+      );
 
     return successResponse(
       {
         candidateId: candidate.id,
         documentId: document.id,
         status: candidate.status,
+        ranking,
+        warnings,
       },
       { status: 201, requestId },
     );

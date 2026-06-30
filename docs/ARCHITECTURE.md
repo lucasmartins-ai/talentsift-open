@@ -9,6 +9,7 @@ TalentSift Open is a local-first portfolio demo for AI-assisted CV review. The a
 - Run locally without cloud credentials.
 - Store only demo analysis state and upload metadata in SQLite.
 - Keep source CV text out of logs and out of the current database schema.
+- Process TXT CV text in memory for mock extraction and ranking.
 - Validate request bodies before service logic runs.
 - Keep ranking deterministic and unit-testable.
 
@@ -52,7 +53,9 @@ The home screen is the working demo surface:
 - CV file picker.
 - Privacy-first toggle.
 - Scoring hints.
-- Placeholder panels for shortlist and comparison.
+- Reviewer-facing shortlist output for TXT files processed by the mock
+  pipeline.
+- Placeholder panel for future side-by-side comparison.
 
 The frontend sends metadata to server APIs and does not import database clients, server-only environment variables, or ranking code that needs to be trusted server-side.
 
@@ -103,7 +106,18 @@ Set `DATA_BACKEND=memory` to use the in-memory repositories instead of SQLite.
 
 ### Mock Adapters
 
-The project keeps adapter interfaces for storage, parsing, and AI extraction, but the public demo does not call real providers. This keeps the code inspectable without requiring API keys or cloud accounts.
+The project keeps adapter interfaces for storage, parsing, and AI extraction,
+but the public demo does not call real providers. This keeps the code
+inspectable without requiring API keys or cloud accounts.
+
+Current mock behavior:
+
+- TXT files are decoded in memory.
+- PDF files return a clear parser warning because PDF extraction is deferred.
+- The mock LLM adapter uses deterministic vocabulary scanning, not real NLP.
+- Derived ranking output is returned inline to the UI and is not persisted yet.
+  Candidate rows stay in their persisted upload state until a future rankings
+  table or status update flow is added.
 
 ### Ranking Service
 
@@ -126,6 +140,7 @@ Scores are triage aids, not decisions.
 - Ignore `.env*`, local SQLite files, logs, build output, coverage, and test artifacts.
 - Do not render model or mock output as trusted HTML.
 - Do not log raw CV text.
+- Do not persist raw CV text.
 - Use only synthetic fixtures and screenshots.
 - Treat uploaded file names as untrusted display values.
 

@@ -2,7 +2,7 @@
   "name": "talentsift-open",
   "version": "0.1.0",
   "private": true,
-  "description": "AI-assisted CV screening for summarizing, comparing, and shortlisting candidates for human review.",
+  "description": "AI-assisted CV review demo for evidence, gaps, and human oversight.",
   "scripts": {
     "dev": "next dev",
     "build": "next build",

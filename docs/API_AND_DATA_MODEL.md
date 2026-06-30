@@ -46,7 +46,7 @@ Request:
 }
 ```
 
-Response:
+Response excerpt:
 
 ```json
 {
@@ -75,9 +75,14 @@ Request:
   "originalFilename": "synthetic-cv.txt",
   "contentType": "text/plain",
   "sizeBytes": 4096,
-  "candidateLabel": "Synthetic Candidate"
+  "candidateLabel": "Synthetic Candidate",
+  "candidateText": "Synthetic CV text for local mock extraction..."
 }
 ```
+
+`candidateText` is optional. When present for a text file, it is processed
+in memory for mock extraction and ranking, then discarded. It is not stored in
+SQLite. PDF extraction is not enabled in the public demo.
 
 Response:
 
@@ -87,7 +92,16 @@ Response:
   "data": {
     "candidateId": "cand_123",
     "documentId": "doc_123",
-    "status": "uploaded"
+    "status": "uploaded",
+    "ranking": {
+      "score": 78,
+      "matchedSkills": ["TypeScript", "React"],
+      "missingRequirements": ["PostgreSQL"],
+      "justification": "Candidate shows evidence for multiple required skills.",
+      "confidence": "medium",
+      "reviewFlags": []
+    },
+    "warnings": []
   },
   "meta": {
     "requestId": "req_456"
@@ -95,7 +109,11 @@ Response:
 }
 ```
 
-The current demo registers metadata only. It does not store raw CV text.
+If `candidateText` is omitted, `ranking` is `null` and the endpoint registers
+metadata only. The current demo does not persist raw CV text or derived
+ranking rows. The real `ranking` payload is the full `RankingResult`, including
+the detailed `scoreBreakdown`; the excerpt above shows the fields most visible
+in the UI.
 
 ## Planned Mock-Only Extensions
 
@@ -161,6 +179,7 @@ Validate:
 - Job description length.
 - File type and size.
 - Candidate label length.
+- Optional candidate text length.
 - Analysis ID format.
 - Scoring config fields.
 - Score range in ranking tests.

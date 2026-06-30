@@ -4,7 +4,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "TalentSift Open",
   description:
-    "AI-assisted CV screening for summarizing, comparing, and shortlisting candidates for human review.",
+    "AI-assisted CV review demo for evidence, gaps, and human oversight.",
 };
 
 export default function RootLayout({
