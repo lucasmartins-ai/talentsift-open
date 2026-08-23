@@ -139,6 +139,10 @@ docs/           Product, architecture, privacy, and roadmap notes
 test/           Vitest coverage for core behavior
 ```
 
+## Built by LookADev
+
+[`talentsift-open`](https://github.com/vetlucasmartins/talentsift-open) is built by [LookADev](https://lookadev.com), a software & AI automation studio. Teams lose hours reviewing CVs by hand; this shows how the screening can be deterministic and run locally. If you are hiring or building talent tooling and want this workflow production-ready, we take on a small number of projects. **Start a project → lookadev.com** · **Email: lucas@lookadev.com**
+
 ## License
 
 A license has not been selected yet. Do not reuse this code as open source
