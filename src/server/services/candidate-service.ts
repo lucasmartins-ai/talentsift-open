@@ -5,6 +5,7 @@ import type {
 } from "@/types/domain";
 import type { UploadMetadataInput } from "@/lib/validation";
 import { mockLlmAdapter } from "@/lib/ai/mock-llm-adapter";
+import { typesafeLlmAdapter } from "@/lib/ai/typesafe-llm-adapter";
 import type { LlmAdapter } from "@/lib/ai/llm-adapter";
 import { textCandidateParser } from "@/lib/parsing/text-parser";
 import type { CandidateDocumentParser } from "@/lib/parsing/parser";
@@ -91,5 +92,5 @@ export const candidateService = new CandidateService(
   analysisRepository,
   candidateRepository,
   textCandidateParser,
-  mockLlmAdapter,
+  typesafeLlmAdapter,
 );
